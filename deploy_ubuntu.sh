@@ -13,7 +13,7 @@ set -e
 SERVICE_NAME="mobywatel"
 PROJECT_USER="mobywatel_user"
 DEST_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-DOMAIN="185-167-99-62.cloud-xip.com"
+DOMAIN="212-115-110-157.cloud-xip.com"
 SSL_EMAIL="polciovps@atomicmail.io"
 GUNICORN_WORKERS=$((2 * $(nproc) + 1))
 # POPRAWKA: Polityka CSP dopasowana do potrzeb aplikacji (QR codes, fonty zewnętrzne, Service Worker)
