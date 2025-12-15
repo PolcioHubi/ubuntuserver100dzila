@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token_func() }}">
+    <title>Podmieniacz Danych HTML</title>
+    <link rel="stylesheet" href="/static/css/index.css">
+    <style>
+        /* Dyskretny widżet impersonacji */
+        .impersonation-widget {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: #7f8c8d;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            z-index: 9999;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            border: 1px solid #616a6b;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            opacity: 0.9;
+        }
+        .impersonation-widget a {
+            color: #ecf0f1;
+            font-weight: bold;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+    <!-- SweetAlert2 -->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    {% if is_impersonating %}
+    <div class="impersonation-widget">
+        Impersonujesz: <strong>{{ username }}</strong> 
+        <a onclick="stopImpersonation()">[ Zakończ ]</a>
+    </div>
+    {% endif %}
+
+    {% if not user_logged_in %}
+    <!-- Strona logowania dla niezalogowanych użytkowników -->
+    <div class="login-page">
+        <div class="login-container">
+            <h1>🔐</h1>
+            <h1>Podmieniacz Danych HTML</h1>
+            <p>Zaloguj się lub zarejestruj, aby uzyskać dostęp do aplikacji</p>
+
+            <div class="login-buttons">
+                <a href="/login" class="login-btn primary">🔐 Zaloguj się</a>
+                <a href="/register" class="login-btn secondary">📝 Zarejestruj się</a>
+            </div>
+
+            <div class="stats-section">
+                <h2>Statystyki Użytkowników</h2>
+                <p>Łącznie zarejestrowanych użytkowników: <strong>{{ total_registered_users }}</strong></p>
+                <p>Aktywnych użytkowników: <strong>{{ num_active_users }}</strong></p>
+                {% if top_user %}
+                    <p>Użytkownik z największą liczbą Hubert Coinów: <strong>{{ top_user.username }} ({{ top_user.hubert_coins }} HC)</strong></p>
+                {% else %}
+                    <p>Brak użytkowników z Hubert Coinami.</p>
+                {% endif %}
+            </div>
+
+            <div class="admin-link-bottom">
+                <a href="/admin">🔧 Panel administratora</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Główna aplikacja dla zalogowanych użytkowników -->
+    <div class="main-app">
+        <!-- Link do panelu administracyjnego -->
+        <a href="/admin" class="admin-link">🔧 Admin</a>
+
+        <!-- Status użytkownika -->
+        <div class="user-status">
+            <div class="user-info-box">
+                👤 Zalogowany: <strong>{{ username }}</strong>
+            </div>
+            <a href="/logout" class="logout-btn">🚪 Wyloguj</a>
+            <a href="/profile" class="logout-btn">👤 Profil</a>
+        </div>
+
+        <div class="stats-section">
+            <h2>Statystyki Użytkowników</h2>
+            <p>Łącznie zarejestrowanych użytkowników: <strong>{{ total_registered_users }}</strong></p>
+            <p>Aktywnych użytkowników: <strong>{{ num_active_users }}</strong></p>
+            {% if top_user %}
+                <p>Użytkownik z największą liczbą Hubert Coinów: <strong>{{ top_user.username }} ({{ top_user.hubert_coins }} HC)</strong></p>
+            {% else %}
+                <p>Brak użytkowników z Hubert Coinami.</p>
+            {% endif %}
+        </div>
+
+        <!-- Sekcja Ogłoszeń -->
+        {% if announcements %}
+        <div class="announcements-container">
+            {% for announcement in announcements %}
+            <div class="announcement alert-{{ announcement.type }}" id="announcement-{{ announcement.id }}">
+                <strong>{{ announcement.title }}</strong>
+                <p>{{ announcement.message }}</p>
+                <small>Opublikowano: {{ announcement.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                <button class="delete-announcement-btn" onclick="deleteAnnouncement({{ announcement.id }})">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="container">
+            <h1>Podmieniacz Danych HTML</h1>
+            <p class="description">Wypełnij formularz nowymi danymi, które zastąpią istniejące dane w pliku HTML.</p>
+
+            <div class="disclaimer">
+                <h3>⚠️ UWAGA - CELE EDUKACYJNE</h3>
+                <p>Ta aplikacja została stworzona wyłącznie w celach edukacyjnych i demonstracyjnych. Nie należy jej używać do tworzenia fałszywych dokumentów ani do jakichkolwiek nielegalnych działań. Użytkownik ponosi pełną odpowiedzialność za sposób wykorzystania tej aplikacji.</p>
+            </div>
+
+            <div class="example-data-section">
+                <button type="button" id="generate-random-data-btn" class="example-btn random-btn">
+                    Generuj losowe dane
+                </button>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" id="mainForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token_func() }}">
+                <input type="hidden" id="userName" name="user_name" value="{{ username }}">
+
+                <fieldset>
+                    <legend>Zdjęcie</legend>
+                    <div class="form-group">
+                        <label for="image_upload">Wgraj zdjęcie (zdjecie_686510da4d2591.91511191.jpg):</label>
+                        <input type="file" id="image_upload" name="image_upload" accept="image/*">
+                        <img id="imagePreview" src="" alt="Podgląd zdjęcia" style="max-width: 100%; height: auto; display: none; margin-top: 10px;">
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Dane Osobowe</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="imie">Imię:</label>
+                            <input type="text" id="imie" name="imie" placeholder="np. PIOTR">
+                        </div>
+                        <div class="form-group">
+                            <label for="nazwisko">Nazwisko:</label>
+                            <input type="text" id="nazwisko" name="nazwisko" placeholder="np. KOWALSKI">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="obywatelstwo">Obywatelstwo:</label>
+                            <input type="text" id="obywatelstwo" name="obywatelstwo" placeholder="np. polskie">
+                        </div>
+                        <div class="form-group">
+                            <label for="data_urodzenia">Data urodzenia (DD.MM.RRRR):</label>
+                            <input type="text" id="data_urodzenia" name="data_urodzenia" placeholder="np. 15.03.1990">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="plec">Płeć:</label>
+                        <select id="plec" name="plec">
+                            <option value="">Wybierz płeć</option>
+                            <option value="M">Mężczyzna</option>
+                            <option value="K">Kobieta</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pesel">Numer PESEL:</label>
+                        <div class="pesel-group">
+                            <input type="text" id="pesel" name="pesel" placeholder="np. 90031512345" maxlength="11">
+                            <button type="button" class="generate-pesel-btn">Automatyczne generowanie PESELu</button>
+                        </div>
+                        <p class="help-text" style="font-size: 0.9em; color: #aaa; margin-top: 5px;">
+                            PESEL jest generowany automatycznie na podstawie daty urodzenia i płci.
+                            Upewnij się, że pola "Data urodzenia" i "Płeć" są wypełnione.
+                        </p>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Dane mDowodu</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="seria_numer_mdowodu">Seria i numer mDowodu:</label>
+                            <input type="text" id="seria_numer_mdowodu" name="seria_numer_mdowodu" placeholder="np. ABC123456">
+                        </div>
+                        <div class="form-group">
+                            <label for="termin_waznosci_mdowodu">Termin ważności mDowodu (RRRR-MM-DD):</label>
+                            <input type="date" id="termin_waznosci_mdowodu" name="termin_waznosci_mdowodu">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="data_wydania_mdowodu">Data wydania mDowodu (RRRR-MM-DD):</label>
+                            <input type="date" id="data_wydania_mdowodu" name="data_wydania_mdowodu">
+                        </div>
+                        <div class="form-group">
+                            <label for="imie_ojca_mdowod">Imię ojca (mDowód):</label>
+                            <input type="text" id="imie_ojca_mdowod" name="imie_ojca_mdowod" placeholder="np. JAN">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imie_matki_mdowod">Imię matki (mDowód):</label>
+                        <input type="text" id="imie_matki_mdowod" name="imie_matki_mdowod" placeholder="np. ANNA">
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Dane Dowodu Osobistego</legend>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="seria_numer_dowodu">Seria i numer dowodu osobistego:</label>
+                            <input type="text" id="seria_numer_dowodu" name="seria_numer_dowodu" placeholder="np. DEF789012">
+                        </div>
+                        <div class="form-group">
+                            <label for="termin_waznosci_dowodu">Termin ważności dowodu osobistego (RRRR-MM-DD):</label>
+                            <input type="date" id="termin_waznosci_dowodu" name="termin_waznosci_dowodu">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="data_wydania_dowodu">Data wydania dowodu osobistego (RRRR-MM-DD):</label>
+                        <input type="date" id="data_wydania_dowodu" name="data_wydania_dowodu">
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Dodatkowe Dane</legend>
+
+
+                    <div class="form-group">
+                        <label for="nazwisko_rodowe">Nazwisko rodowe:</label>
+                        <input type="text" id="nazwisko_rodowe" name="nazwisko_rodowe" placeholder="np. KOWALSKA">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nazwisko_rodowe_ojca">Nazwisko rodowe ojca:</label>
+                            <input type="text" id="nazwisko_rodowe_ojca" name="nazwisko_rodowe_ojca" placeholder="np. KOWALSKI">
+                        </div>
+                        <div class="form-group">
+                            <label for="nazwisko_rodowe_matki">Nazwisko rodowe matki:</label>
+                            <input type="text" id="nazwisko_rodowe_matki" name="nazwisko_rodowe_matki" placeholder="np. NOWAK">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="miejsce_urodzenia">Miejsce urodzenia:</label>
+                        <input type="text" id="miejsce_urodzenia" name="miejsce_urodzenia" placeholder="np. Warszawa">
+                        </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adres_zameldowania">Adres zameldowania:</label>
+                            <textarea id="adres_zameldowania" name="adres_zameldowania" rows="3" placeholder="np. ul. Przykładowa 123, 00-001 Warszawa"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="data_zameldowania">Data zameldowania (RRRR-MM-DD):</label>
+                            <input type="date" id="data_zameldowania" name="data_zameldowania">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn">Modyfikuj i Zapisz</button>
+                    <button type="button" class="clear-btn" onclick="clearForm()">Wyczyść formularz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal powiadomienia o zapisie -->
+    <div id="notificationModal" class="notification-modal" style="display:none;">
+        <div class="notification-modal-content">
+            <h2 id="notificationTitle"></h2>
+            <p id="notificationMessage"></p>
+            <button onclick="closeNotificationModal()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- GENERAL HELPER FUNCTIONS ---
+            function logAction(actionDescription) {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                fetch('/api/log-action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ action: actionDescription }),
+                }).catch(error => console.error('Error logging action:', error));
+            }
+
+            function showAlert(message, type = 'info') {
+                Swal.fire({
+                    title: type.charAt(0).toUpperCase() + type.slice(1),
+                    text: message,
+                    icon: type,
+                    confirmButtonColor: '#4caf50',
+                    background: '#1a1a1a',
+                    color: '#e0e0e0'
+                });
+            }
+
+            function showNotification(title, message, type) {
+                document.getElementById('notificationTitle').textContent = title;
+                document.getElementById('notificationMessage').textContent = message;
+                document.getElementById('notificationModal').style.display = 'block';
+            }
+
+            window.closeNotificationModal = function() {
+                document.getElementById('notificationModal').style.display = 'none';
+            }
+
+            // --- FORM LOGIC ---
+            async function generatePESEL() {
+                const birthDateInput = document.getElementById('data_urodzenia');
+                const genderSelect = document.getElementById('plec');
+                const peselInput = document.getElementById('pesel');
+                const birthDate = birthDateInput.value;
+                const gender = genderSelect.value;
+
+                if (!birthDate || !gender) {
+                    showAlert('Proszę wypełnić datę urodzenia i płeć, aby wygenerować PESEL.', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/generate_pesel', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({ birth_date: birthDate, gender: gender }),
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        peselInput.value = data.pesel;
+                        showAlert('PESEL został wygenerowany pomyślnie.', 'success');
+                    } else {
+                        showAlert(data.error || 'Nie udało się wygenerować numeru PESEL.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Błąd podczas generowania PESEL:', error);
+                    showAlert('Wystąpił błąd komunikacji z serwerem.', 'error');
+                }
+            }
+
+            window.clearForm = function() {
+                logAction("Clicked 'Clear form' button.");
+                document.getElementById('mainForm').reset();
+                const inputs = document.getElementById('mainForm').querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    if (input.type === 'radio' || input.type === 'checkbox') {
+                        input.checked = false;
+                    } else if (input.type !== 'hidden') {
+                        input.value = '';
+                    }
+                });
+                const imagePreview = document.getElementById('imagePreview');
+                if (imagePreview) {
+                    imagePreview.src = '';
+                    imagePreview.style.display = 'none';
+                }
+            }
+
+            document.getElementById('mainForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                logAction("Clicked 'Modify and Save' button (form submission).");
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                const submitBtn = document.querySelector('.submit-btn');
+                loadingOverlay.classList.add('visible');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Ładowanie...';
+                const formData = new FormData(this);
+                try {
+                    const response = await fetch('/', { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification('Sukces!', result.message, 'success');
+                        // NEW LOGIC: Trigger tutorial step 2 after successful form submission
+                        if (!hasSeenTutorial && currentStep === 1) {
+                            showTutorialStep(2);
+                        }
+                    } else {
+                        showNotification('Błąd!', result.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Błąd!', 'Wystąpił błąd podczas wysyłania danych.', 'error');
+                } finally {
+                    loadingOverlay.classList.remove('visible');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Modyfikuj i Zapisz';
+                }
+            });
+
+            document.getElementById('image_upload').addEventListener('change', function(event) {
+                const [file] = event.target.files;
+                if (file) {
+                    logAction(`Selected an image to upload: ${file.name}`);
+                    const imagePreview = document.getElementById('imagePreview');
+                    imagePreview.src = URL.createObjectURL(file);
+                    imagePreview.style.display = 'block';
+                }
+            });
+
+            const generateRandomBtn = document.getElementById('generate-random-data-btn');
+            if (generateRandomBtn) {
+                generateRandomBtn.addEventListener('click', async function() {
+                    logAction("Clicked 'Generate random data' button.");
+                    const plecSelect = document.getElementById('plec');
+                    const selectedPlec = plecSelect.value;
+                    if (!selectedPlec) {
+                        alert('Proszę najpierw wybrać płeć z listy.');
+                        return;
+                    }
+                    try {
+                        const response = await fetch(`/api/generate-random-data?plec=${selectedPlec}`, {
+                            method: 'GET',
+                            headers: { 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }
+                        });
+                        if (!response.ok) throw new Error('Błąd sieci lub serwera');
+                        const data = await response.json();
+                        for (const [key, value] of Object.entries(data)) {
+                            const element = document.getElementById(key);
+                            if (element) element.value = value;
+                        }
+                    } catch (error) {
+                        console.error('Błąd podczas pobierania losowych danych:', error);
+                        alert('Nie udało się załadować losowych danych.');
+                    }
+                });
+            }
+
+            const generatePeselBtn = document.querySelector('.generate-pesel-btn');
+            if (generatePeselBtn) {
+                generatePeselBtn.addEventListener('click', generatePESEL);
+            }
+
+            // --- INITIAL DATA POPULATION ---
+            const lastFormData = {{ last_form_data | tojson }};
+            for (const [key, value] of Object.entries(lastFormData)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.type === 'date') {
+                        const dateParts = value.split('.');
+                        if (dateParts.length === 3) {
+                            element.value = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                        } else {
+                            element.value = value;
+                        }
+                    } else {
+                        element.value = value;
+                    }
+                }
+            }
+            const imagePreview = document.getElementById('imagePreview');
+            const imageFilename = lastFormData.image_filename;
+            if (imageFilename) {
+                const imageUrl = `/user_files/{{ username }}/${imageFilename}`;
+                imagePreview.src = imageUrl;
+                imagePreview.style.display = 'block';
+            } else {
+                imagePreview.src = '';
+                imagePreview.style.display = 'none';
+            }
+
+            // --- TUTORIAL LOGIC ---
+            const hasSeenTutorial = {{ has_seen_tutorial | tojson }};
+            let currentStep = 0;
+            const tutorialSteps = [
+                { title: "Witaj w Poradniku!", message: "Czy chcesz zobaczyć krótki samouczek, jak korzystać z aplikacji?", showNext: true, showSkip: true },
+                { title: "Etap 1: Formularz i Twoje Dane", message: "To jest główny formularz. Możesz tu ręcznie wpisać dane lub użyć przycisku <b>Generuj losowe dane</b> (pamiętaj, aby najpierw wybrać płeć!). Przycisk <b>Automatyczne generowanie PESELu</b> stworzy poprawny numer PESEL na podstawie daty urodzenia i płci. Po wgraniu zdjęcia zobaczysz jego podgląd. <br><br>Jeśli chcesz, aby Twoje zdjęcie wyglądało idealnie (akceptowane przez rząd, idealne kolory), możesz zamówić profesjonalną korektę za <b>10 zł</b> lub <b>1 Hubert Coin</b>. Nie wiesz, czym są Hubert Coiny? Wszystko wyjaśni się w kolejnych etapach!", showNext: true, showSkip: true },
+                { title: "Etap 2: Modyfikacja i Profil", message: "Świetnie! Twoje dane zostały zapisane. Teraz przejdziemy do Twojego profilu, gdzie czeka na Ciebie kolejny etap samouczka.", showNext: true, showSkip: false }
+            ];
+
+            function showTutorialStep(step) {
+                currentStep = step;
+                const modal = document.getElementById('tutorialModal');
+                const title = document.getElementById('tutorialTitle');
+                const message = document.getElementById('tutorialMessage');
+                const nextBtn = document.getElementById('tutorialBtnNext');
+                const skipBtn = document.getElementById('tutorialBtnSkip');
+                const stepData = tutorialSteps[step];
+                title.innerHTML = stepData.title;
+                message.innerHTML = stepData.message;
+                nextBtn.style.display = stepData.showNext ? 'inline-block' : 'none';
+                skipBtn.style.display = stepData.showSkip ? 'inline-block' : 'none';
+                if (step === 0) nextBtn.textContent = "Tak, zacznijmy";
+                else if (step === 1) nextBtn.textContent = "Przejdźmy do wypełniania formularza";
+                else if (step === 2) nextBtn.textContent = "Przejdź do profilu";
+                else nextBtn.textContent = "Dalej";
+                modal.style.display = 'flex';
+            }
+
+            function completeTutorial(andCloseModal = true) {
+                if (andCloseModal) {
+                    document.getElementById('tutorialModal').style.display = 'none';
+                }
+                fetch('/api/complete-tutorial', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content') }
+                }).catch(err => console.error("Błąd podczas kończenia samouczka:", err));
+            }
+
+            document.getElementById('tutorialBtnNext').addEventListener('click', () => {
+                if (currentStep === 0) {
+                    showTutorialStep(1);
+                } else if (currentStep === 1) {
+                    document.getElementById('tutorialModal').style.display = 'none'; // Just hide the modal
+                } else if (currentStep === 2) {
+                    window.location.href = '/profile?tutorial=true';
+                }
+            });
+
+            document.getElementById('tutorialBtnSkip').addEventListener('click', () => completeTutorial(true));
+            document.getElementById('tutorial-dont-show-again').addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    completeTutorial(false);
+                }
+            });
+
+            if (!hasSeenTutorial) {
+                showTutorialStep(0);
+            }
+
+            window.stopImpersonation = async function() {
+                if (!confirm('Czy na pewno chcesz zakończyć impersonację i wrócić do swojego konta admina?')) return;
+
+                try {
+                    const response = await fetch('/admin/api/impersonate/stop', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        showAlert('Impersonacja zakończona. Przekierowywanie do panelu admina...', 'success');
+                        window.location.href = '/admin';
+                    } else {
+                        showAlert(data.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error stopping impersonation:', error);
+                    showAlert('Błąd podczas kończenia impersonacji.', 'error');
+                }
+            }
+        });
+    </script>
+    {% endif %}
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorialModal" class="tutorial-modal" style="display:none;">
+        <div class="tutorial-content">
+            <h2 id="tutorialTitle">Witaj w Poradniku!</h2>
+            <p id="tutorialMessage">Czy chcesz zobaczyć krótki samouczek, jak korzystać z aplikacji?</p>
+            <div id="tutorial-step-3-options" style="display:none;">
+                <p>Na jakim urządzeniu chcesz zobaczyć instrukcję?</p>
+                <button class="btn-tutorial" onclick="showTutorialStep(4, 'iphone')">iPhone</button>
+                <button class="btn-tutorial" onclick="showTutorialStep(4, 'android')">Android</button>
+            </div>
+            <div id="tutorial-step-4-image" style="display:none;">
+                <img id="tutorial-platform-image" src="" alt="Instrukcja instalacji" style="max-width: 100%; border: 1px solid #333;"/>
+                <p id="tutorial-step-4-instruction" style="margin-top: 10px;"></p>
+            </div>
+            <div class="tutorial-buttons">
+                <button id="tutorialBtnSkip" class="btn-tutorial-skip">Pomiń</button>
+                <button id="tutorialBtnNext" class="btn-tutorial">Dalej</button>
+            </div>
+            <div class="tutorial-footer">
+                <input type="checkbox" id="tutorial-dont-show-again">
+                <label for="tutorial-dont-show-again">Nie pokazuj tego ponownie</label>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

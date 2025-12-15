@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token_func() }}">
+    <title>Profil Użytkownika - {{ username }}</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0d0d0d;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            width: 100%;
+            max-width: 800px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .header h1 {
+            font-size: 2em;
+            margin: 0;
+            color: #fff;
+        }
+        .header .username {
+            color: #4caf50; /* Zielony akcent */
+        }
+        .profile-container {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            font-size: 1.5em;
+            color: #4caf50;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 10px;
+        }
+        .info-grid .label {
+            font-weight: bold;
+            color: #aaa;
+        }
+        .info-grid .value {
+            color: #e0e0e0;
+        }
+        .actions a {
+            display: inline-block;
+            background-color: #333;
+            color: #e0e0e0;
+            padding: 10px 15px;
+            text-decoration: none;
+            border: 1px solid #555;
+            transition: background-color 0.3s, color 0.3s;
+            margin-right: 10px;
+        }
+        .actions a:hover {
+            background-color: #4caf50;
+            color: #0d0d0d;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>[ Profil <span class="username">{{ username }}</span> ]</h1>
+    </div>
+
+    <div class="profile-container">
+        <div class="section">
+            <h2>Informacje o Koncie</h2>
+            <div class="info-grid">
+                <div class="label">Nazwa Użytkownika:</div>
+                <div class="value">{{ username }}</div>
+                <div class="label">Status:</div>
+                <div class="value" style="color: #4caf50;">Aktywny</div>
+                <div class="label">Data Rejestracji:</div>
+                <div class="value">{{ created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                <div class="label">Hubert Coin:</div>
+                <div class="value">{{ hubert_coins }} 🪙</div>
+            </div>
+            <p style="font-size: 0.8em; color: #888; margin-top: 10px;">Hubert Coin to nagroda za zaproszenie użytkownika do zakupu naszej usługi.</p>
+        </div>
+
+        <div class="section">
+            <h2>Zarządzanie Plikami</h2>
+            <p>Zarządzaj swoimi wygenerowanymi plikami i danymi.</p>
+            <div class="actions">
+                <a href="/logowaniedozmodyfikowanieplikuhtml">Przeglądaj Pliki</a>
+                <a href="/">Strona Główna</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Tabela Prowizji Hubert Coin</h2>
+            <table class="commission-table">
+                <thead>
+                    <tr>
+                        <th>Liczba zebranych Hubert Coinów</th>
+                        <th>Wartość do wypłaty</th>
+                        <th>Twoja prowizja od 1 osoby!</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1 HC</td>
+                        <td>5 zł</td>
+                        <td>5 zł</td>
+                    </tr>
+                    <tr>
+                        <td>2 HC</td>
+                        <td>15 zł</td>
+                        <td>7,50 zł</td>
+                    </tr>
+                    <tr>
+                        <td>4 HC</td>
+                        <td>35 zł</td>
+                        <td>8,75 zł</td>
+                    </tr>
+                    <tr>
+                        <td>10 HC</td>
+                        <td>100 zł</td>
+                        <td style="color: #4caf50; font-weight: bold;">10 zł!</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025. Wszelkie prawa zastrzeżone.</p>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorialModal" class="tutorial-modal" style="display:none;">
+        <div class="tutorial-content">
+            <h2 id="tutorialTitle"></h2>
+            <p id="tutorialMessage"></p>
+            <div id="tutorial-step-3-options" style="display:none;">
+                <p>Na jakim urządzeniu chcesz zobaczyć instrukcję?</p>
+                <button class="btn-tutorial" onclick="showTutorialStep(4, 'iphone')">iPhone</button>
+                <button class="btn-tutorial" onclick="showTutorialStep(4, 'android')">Android</button>
+            </div>
+            <div id="tutorial-step-4-image" style="display:none;">
+                <img id="tutorial-platform-image" src="" alt="Instrukcja instalacji" style="max-width: 100%; border: 1px solid #333;"/>
+                <p id="tutorial-step-4-instruction" style="margin-top: 10px;"></p>
+            </div>
+            <div class="tutorial-buttons">
+                <button id="tutorialBtnSkip" class="btn-tutorial-skip">Pomiń</button>
+                <button id="tutorialBtnNext" class="btn-tutorial">Dalej</button>
+            </div>
+            <div class="tutorial-footer">
+                <input type="checkbox" id="tutorial-dont-show-again">
+                <label for="tutorial-dont-show-again">Nie pokazuj tego ponownie</label>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="/static/css/profile.css">
+    <script>
+        // Ten sam kod co w index.html, ale z logiką startującą od etapu 3
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('tutorial') === 'true') {
+                showTutorialStep(3);
+            }
+        });
+
+        let currentStep = 0;
+        const tutorialSteps = [
+            {},
+            {},
+            {},
+            {
+                title: "Etap 3: Hubert Coiny i Instalacja",
+                message: "Witaj na swoim profilu! Tutaj możesz zarządzać swoimi plikami. Możesz również zbierać <b>Hubert Coiny</b>, polecając aplikację znajomym. Wystarczy, że podczas rejestracji podadzą Twoją nazwę użytkownika (<b>{{ username }}</b>) w polu 'kod polecający'. Zebrane monety możesz wymienić na nagrody. <br><br>Teraz pokażemy Ci, jak dodać aplikację do ekranu głównego.",
+                showNext: false,
+                showSkip: true
+            },
+            {
+                title: "Etap 4: Instalacja na Twoim urządzeniu",
+                message: "", // Dynamicznie ustawiana wiadomość
+                showNext: true, // Zmienione na true, aby pokazać przycisk 'Zakończ'
+                showSkip: false
+            }
+        ];
+
+        function showTutorialStep(step, platform = null) {
+            currentStep = step;
+            const modal = document.getElementById('tutorialModal');
+            const title = document.getElementById('tutorialTitle');
+            const message = document.getElementById('tutorialMessage');
+            const nextBtn = document.getElementById('tutorialBtnNext');
+            const skipBtn = document.getElementById('tutorialBtnSkip');
+            const step3Options = document.getElementById('tutorial-step-3-options');
+            const step4ImageContainer = document.getElementById('tutorial-step-4-image');
+
+            modal.style.display = 'flex';
+
+            if (step === 3) { // Krok 3 w profile.html
+                title.textContent = tutorialSteps[3].title;
+                message.textContent = tutorialSteps[3].message;
+                nextBtn.style.display = 'none';
+                skipBtn.style.display = 'inline-block';
+                step3Options.style.display = 'block';
+                step4ImageContainer.style.display = 'none';
+            } else if (step === 4) { // Krok 4 w profile.html
+                title.textContent = tutorialSteps[4].title;
+                message.textContent = tutorialSteps[4].message;
+                step3Options.style.display = 'none';
+                step4ImageContainer.style.display = 'block';
+                const img = document.getElementById('tutorial-platform-image');
+                const instruction = document.getElementById('tutorial-step-4-instruction');
+                if (platform === 'iphone') {
+                    img.src = '/static/iphone/iphone.png';
+                    instruction.textContent = "Na iPhonie, aby dodać aplikację do ekranu głównego, postępuj zgodnie z instrukcjami na obrazku.";
+                } else {
+                    img.src = '/static/android/android.png';
+                    instruction.textContent = "Na Androidzie, aby dodać aplikację do ekranu głównego, kliknij 'Install', a nie 'Create shortcut'.";
+                }
+                nextBtn.textContent = "Zakończ samouczek";
+                nextBtn.style.display = 'inline-block';
+                skipBtn.style.display = 'none';
+            }
+        }
+
+        document.getElementById('tutorialBtnNext').addEventListener('click', () => {
+            if (currentStep === 4) {
+                completeTutorial();
+            }
+        });
+
+        document.getElementById('tutorialBtnSkip').addEventListener('click', () => {
+            completeTutorial();
+        });
+
+        document.getElementById('tutorial-dont-show-again').addEventListener('change', (e) => {
+            if (e.target.checked) {
+                completeTutorial();
+            }
+        });
+
+        function completeTutorial() {
+            const modal = document.getElementById('tutorialModal');
+            modal.style.display = 'none';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            fetch('/api/complete-tutorial', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                }
+            }).catch(err => console.error("Błąd podczas kończenia samouczka:", err));
+        }
+    </script>
+</body>
+</html>

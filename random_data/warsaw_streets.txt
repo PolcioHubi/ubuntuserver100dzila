@@ -1,0 +1,234 @@
+Marszałkowska
+Jerozolimskie
+Nowy Świat
+Puławska
+Aleje Ujazdowskie
+Krakowskie Przedmieście
+Solidarności
+Targowa
+Grochowska
+Wołoska
+Niepodległości
+Jana Pawła II
+Świętokrzyska
+Grójecka
+Czerniakowska
+Wilanowska
+Belwederska
+Górczewska
+Powstańców Śląskich
+Wolska
+Prosta
+Towarowa
+Okopowa
+Marymoncka
+Kasprowicza
+Broniewskiego
+Reymonta
+Żeromskiego
+Mickiewicza
+Andersa
+Plac Bankowy
+Plac Zbawiciela
+Plac Konstytucji
+Plac Wilsona
+Rondo Daszyńskiego
+Rondo ONZ
+Rondo Waszyngtona
+Most Poniatowskiego
+Most Świętokrzyski
+Most Gdański
+Hoża
+Koszykowa
+Piękna
+Wspólna
+Żurawia
+Chmielna
+Złota
+Sienna
+Pańska
+Twarda
+Grzybowska
+Królewska
+Senatorska
+Miodowa
+Długa
+Podwale
+Freta
+Piwna
+Kopernika
+Tamka
+Dobra
+Solec
+Rozbrat
+Górnośląska
+Myśliwiecka
+Agrykola
+Łazienkowska
+Czerniakowska
+Sobieskiego
+Sikorskiego
+Witosa
+KEN
+Rosoła
+Płaskowickiej
+Dereniowa
+Cynamonowa
+Indiry Gandhi
+Anody
+Obrzeżna
+Konstruktorska
+Postępu
+Domaniewska
+Cybernetyki
+Marynarska
+Rzymowskiego
+Gotarda
+Orzycka
+Bokserska
+Kłobucka
+Obrzeżna
+Służewiecka
+Wałbrzyska
+Rolna
+Ciszewskiego
+Pileckiego
+Stryjeńskich
+Wąwozowa
+Przy Bażantarni
+Rzeczypospolitej
+Klimczaka
+Francuska
+Zwycięzców
+Saska
+Ateńska
+Brukselska
+Paryska
+Londyńska
+Wersalska
+Afrykańska
+Bora-Komorowskiego
+Fieldorfa
+Abrahama
+Meissnera
+Jugosłowiańska
+Ostrobramska
+Zamieniecka
+Łukowska
+Polańska
+Biskupia
+Czapelska
+Mińska
+Żupnicza
+Chodakowska
+Gocławska
+Kinowa
+Waszyngtona
+Wiatraczna
+Radzymińska
+Ząbkowska
+Brzeska
+Kijowska
+Jagiellońska
+Wybrzeże Helskie
+Wybrzeże Szczecińskie
+Wybrzeże Kościuszkowskie
+Gdańskie
+Wisłostrada
+Krasickiego
+Potocka
+Słowackiego
+Krasińskiego
+Popiełuszki
+Tołstoja
+Wójcickiego
+Conrada
+Maczka
+Armii Krajowej
+Prymasa Tysiąclecia
+Kasprzaka
+Wolska
+Połczyńska
+Lazurowa
+Radiowa
+Kocjana
+Bolimowska
+Grodkowska
+Olbrachta
+Redutowa
+Ordona
+Gniewkowska
+Jana Kazimierza
+Sowińskiego
+Pustola
+Obozowa
+Deotymy
+Księcia Janusza
+Ostroroga
+Wawrzyszewska
+Górczewska
+Ciołka
+Młynarska
+Płocka
+Skierniewicka
+Leszno
+Żytnia
+Okopowa
+Gibalskiego
+Stawki
+Dzika
+Miła
+Niska
+Anielewicza
+Esperanto
+Nowolipki
+Nowolipie
+Dzielna
+Pawia
+Smocza
+Karmelicka
+Lewartowskiego
+Zamenhofa
+Inflancka
+Słomińskiego
+Muranowska
+Konwiktorska
+Franciszkańska
+Kościelna
+Rycerska
+Brzozowa
+Celna
+Boleść
+Bugaj
+Mostowa
+Wodna
+Steinkellera
+Ciasna
+Krótka
+Wąska
+Szeroka
+Długa
+Nowa
+Stara
+Mała
+Wielka
+Rynek Nowego Miasta
+Rynek Starego Miasta
+Plac Zamkowy
+Plac Teatralny
+Plac Piłsudskiego
+Plac Grzybowski
+Plac Defilad
+Plac Politechniki
+Plac Unii Lubelskiej
+Plac Trzech Krzyży
+Plac na Rozdrożu
+Plac Inwalidów
+Plac Grunwaldzki
+Plac Narutowicza
+Plac Zawiszy
+Plac Wileński
+Plac Hallera
+Plac Szembeka
+Plac Vogla
+Plac Konesera

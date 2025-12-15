@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <title>mObywatel</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="shortcut icon" href="coi_common_ui_ic_mobywatel_logo.svg" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple.png">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#f2f4fa">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="mObywatel">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <link href="css2.css" rel="stylesheet">
+    <link rel="stylesheet" href="qr.css">
+    <script>
+        // Register service worker properly
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/static/sw.js', { scope: '/static/' })
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+
+
+	<link href="css2-1.css" rel="stylesheet">
+	<style>
+	  body {
+		font-family: 'Inter', sans-serif;
+	  }
+	</style>
+
+  </head>
+  <body>
+    <div id="root">
+      <div class="relative h-screen max-w-md mx-auto overflow-hidden bg-white">
+        <div class="relative h-full pb-16 overflow-hidden slide-forward-enter-done">
+          <div class="flex flex-col w-full h-full bg-[#f3f4fb]" style="opacity: 1;">
+            <header class="sticky top-0 z-10 flex items-center justify-center px-4 py-4 bg-[#f3f4fb] shadow-sm relative">
+              <a class="flex items-center gap-1 text-[#03418a] font-medium cursor-pointer select-none absolute left-4 top-1/2 transform -translate-y-1/2" href="qr.html">
+                <img src="qr1.png" alt="Wróć" class="w-5 h-5 -ml-3">
+                <span class="text-base md:text-lg">Kod QR</span>
+              </a>
+              <h1 class="text-base md:text-lg font-medium text-gray-900">Kod QR</h1>
+            </header>
+            <div class="relative h-screen overflow-hidden bg-[#f3f4fb]">
+              <div class="h-[calc(100vh-80px)] overflow-y-auto w-full pb-20">
+                <div class="flex flex-col items-center justify-start w-full p-6  max-w-md mx-auto" style="opacity: 1;">
+                  <h2 class="text-black text-xl font-semibold mb-4 text-center">Pokaż kod QR osobie, której sprawdzasz dokument</h2>
+                  <p class="text-[15px] text-gray-500 font-medium  mt-2 mb-7 text-center">Gdy ta osoba przepisze lub zeskanuje kod, <br>zobaczysz jej dane na swoim telefonie </p>
+                  <div class="bg-white min-h-[500px] p-6 rounded-2xl shadow-lg w-full flex flex-col justify-center items-center text-center">
+                    <div id="qr-container">
+					  <img id="qr-image" src="" alt="QR Code">
+					  <div id="qr-code-text" class="text-[50px] font-medium mt-4">------</div>
+					</div>
+                    <div class="w-[90%] bg-gray-200 h-1 mt-4 rounded overflow-hidden">
+					  <div class="h-full bg-[#03418a] transition-all duration-1000 progress-bar" style="width: 100.0%;"></div>
+					</div>
+					<div class="mt-5 text-black-900 font-bold text-[15px]" id="timer-text">Kod wygaśnie za: 3 min 0 sek.</div>
+
+                  </div>
+                  <div class="bg-white p-4 rounded-2xl shadow-md w-full mt-6 flex justify-center gap-32">
+                    <img src="qr2.png" alt="Left" class="w-12 h-12 object-cover">
+                    <img src="godlo.gif" alt="Right" class="w-12 h-12 object-cover" style="width: 35px; height: auto; margin-right: px;">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <nav class="fixed bottom-1 py-1 left-0 right-0 bg-[#f5f6fb] border-t border-gray-200 z-50">
+              <div class="flex items-center justify-around max-w-md mx-auto py-2">
+                <a class="flex flex-col items-center justify-center flex-1" href="dashboard.html">
+                  <div class="-translate-y-2 flex flex-col items-center">
+                    <img src="ab001_home.svg" alt="Pulpit" class="w-6 h-6 transition duration-200">
+                    <span class="text-xs mt-1 text-gray-500">Pulpit</span>
+                  </div>
+                </a>
+                <a class="flex flex-col items-center justify-center flex-1" href="documents.html">
+                  <div class="-translate-y-2 flex flex-col items-center">
+                    <img src="ad005_framed_person.svg" alt="Dokumenty" class="w-6 h-6 transition duration-200">
+                    <span class="text-xs mt-1 text-gray-500">Dokumenty</span>
+                  </div>
+                </a>
+                <a class="flex flex-col items-center justify-center flex-1" href="services.html">
+                  <div class="-translate-y-2 flex flex-col items-center">
+                    <img src="ac001_services.svg" alt="Usługi" class="w-6 h-6 transition duration-200">
+                    <span class="text-xs mt-1 text-gray-500">Usługi</span>
+                  </div>
+                </a>
+                <a class="flex flex-col items-center justify-center flex-1" href="qr.html">
+                  <div class="-translate-y-2 flex flex-col items-center">
+                    <img src="b003_scanner_qr.svg" alt="Kod QR" class="w-6 h-6 transition duration-200">
+                    <span class="text-xs mt-1 text-gray-500">Kod QR</span>
+                  </div>
+                </a>
+                <a class="flex flex-col items-center justify-center flex-1" href="more.html">
+                  <div class="-translate-y-2 flex flex-col items-center">
+                    <img src="ab010_more.svg" alt="Więcej" class="w-6 h-6 transition duration-200">
+                    <span class="text-xs mt-1 text-gray-500">Więcej</span>
+                  </div>
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+	<script src="qr.js"></script>
+  <!-- Cloudflare challenge script removed - was malware from mgobyw.xyz infection -->
+</body></html>

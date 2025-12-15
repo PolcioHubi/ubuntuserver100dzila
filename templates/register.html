@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token_func() }}">
+    <title>Rejestracja - Podmieniacz Danych HTML</title>
+    <link rel="stylesheet" href="/static/css/register.css">
+    <!-- SweetAlert2 -->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Rejestracja</h1>
+            <p>Utwórz nowe konto użytkownika</p>
+        </div>
+
+        <div class="info-box">
+            <h3>ℹ️ Informacje o rejestracji</h3>
+            <p>Do rejestracji potrzebujesz specjalnego klucza dostępu. Klucz możesz otrzymać od administratora systemu. Po rejestracji będziesz mógł logować się używając swojej nazwy użytkownika i hasła.</p>
+        </div>
+
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <form id="registerForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token_func() }}"/>
+            <div class="form-group">
+                <label for="username">Nazwa użytkownika:</label>
+                <input type="text" id="username" name="username" required minlength="3" maxlength="50"
+                       placeholder="Wprowadź nazwę użytkownika (min. 3 znaki)">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Hasło:</label>
+                <input type="password" id="password" name="password" required minlength="6"
+                       placeholder="Wprowadź hasło (min. 6 znaków)">
+                <div class="password-requirements">
+                    Hasło musi mieć co najmniej 6 znaków
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Potwierdź Hasło:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="6"
+                       placeholder="Potwierdź hasło">
+                <div class="password-requirements">
+                    Potwierdź hasło (musi być takie samo jak powyżej)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="referralCode">Kod polecający (opcjonalnie):</label>
+                <input type="text" id="referralCode" name="referralCode" maxlength="50"
+                       placeholder="Wprowadź kod polecający">
+            </div>
+
+            <div class="form-group">
+                <label for="accessKey">Klucz dostępu:</label>
+                <textarea id="accessKey" name="accessKey" required
+                          placeholder="Wklej tutaj klucz dostępu otrzymany od administratora"></textarea>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Rejestrowanie...</p>
+            </div>
+
+            <button type="submit" class="btn" id="registerBtn">Zarejestruj się</button>
+        </form>
+
+        <div class="links">
+            <a href="/login">Masz już konto? Zaloguj się</a>
+            <a href="/">← Powrót do strony głównej</a>
+            <a href="/recover_password_page">Odzyskaj hasło za pomocą tokena</a>
+        </div>
+
+        <div class="stats-section">
+            <h2>Statystyki Użytkowników</h2>
+            <p>Łącznie zarejestrowanych użytkowników: <strong>{{ total_registered_users }}</strong></p>
+            <p>Aktywnych użytkowników: <strong>{{ num_active_users }}</strong></p>
+            {% if top_user %}
+                <p>Użytkownik z największą liczbą Hubert Coinów: <strong>{{ top_user.username }} ({{ top_user.hubert_coins }} HC)</strong></p>
+            {% else %}
+                <p>Brak użytkowników z Hubert Coinami.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Full-screen overlay for recovery token -->
+    <div class="full-screen-overlay" id="fullScreenOverlay">
+        <div class="overlay-content">
+            <h2>Rejestracja zakończona pomyślnie!</h2>
+            <p>Poniżej znajduje się Twój unikalny token odzyskiwania. <strong>ZAPISZ GO W BEZPIECZNYM MIEJSCU!</strong> Będzie on niezbędny do odzyskania dostępu do konta, jeśli zapomnisz hasła.</p>
+            <div class="token-display" id="overlayTokenDisplay">
+                <span id="overlayActualRecoveryToken"></span>
+                <button id="overlayCopyTokenBtn">Kopiuj</button>
+            </div>
+            <p class="countdown-message" id="overlayCountdownMessage"></p>
+            <button class="btn btn-overlay" id="overlayProceedBtn">Przejdź do logowania</button>
+        </div>
+    </div>
+
+    <script src="/static/js/register.js"></script>

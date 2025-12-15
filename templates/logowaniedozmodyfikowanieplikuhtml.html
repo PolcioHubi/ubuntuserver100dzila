@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mObywatel - Moje dokumenty</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/logowaniedozmodyfikowanieplikuhtml.css">
+</head>
+<body>
+    <div class="container">
+        <div class="section-header">
+            <h1 class="section-title">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000">
+                    <path d="M0 0h24v24H0V0z" fill="none" />
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM17 8H7v2h10V8zm-1 4H7v2h9v-2z" />
+                </svg>
+                Moje dokumenty
+            </h1>
+        </div>
+
+        <div class="file-list" id="fileList">
+            <div class="file-item">
+                <span class="file-name">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="#000000">
+                        <path d="M0 0h24v24H0V0z" fill="none" />
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+                    </svg>
+                    Logowanie
+                </span>
+                <a href="/static/logowanie.html" class="file-link">Otwórz</a>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="goBack()" class="action-button">Powrót</button>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

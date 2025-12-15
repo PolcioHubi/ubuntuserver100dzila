@@ -1,0 +1,27 @@
+{
+    "name": "mObywatel",
+    "short_name": "mObywatel",
+    "start_url": "/static/logowanie.html",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#FFFFFF",
+    "theme_color": "#FFFFFF",
+    "description": "Aplikacja mObywatel",
+    "categories": ["government", "utilities"],
+    "lang": "pl-PL",
+    "icons": [
+      {
+        "src": "apple.png",
+        "sizes": "180x180",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "coi_common_ui_ic_mobywatel_logo.svg",
+        "sizes": "any",
+        "type": "image/svg+xml",
+        "purpose": "any"
+      }
+    ]
+  }

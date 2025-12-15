@@ -1,0 +1,104 @@
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0d0d0d;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .login-container {
+            background-color: #1a1a1a;
+            padding: 40px;
+            border: 1px solid #333;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-header {
+            margin-bottom: 30px;
+        }
+        .login-header h1 {
+            color: #4caf50;
+            margin: 0 0 10px 0;
+            font-size: 2em;
+        }
+        .login-header p {
+            color: #e0e0e0;
+            margin: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #e0e0e0;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #555;
+            background-color: #0d0d0d;
+            color: #e0e0e0;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4caf50;
+            color: #0d0d0d;
+            border: 1px solid #4caf50;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+        .login-btn:hover {
+            background-color: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+        .error-message {
+            background-color: #333;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .back-link {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+        .back-link a {
+            color: #4caf50;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+            color: #e0e0e0;
+        }
+        .admin-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #4caf50;
+        }

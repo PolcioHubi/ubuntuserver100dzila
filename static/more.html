@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>mObywatel 2.0</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="shortcut icon" href="coi_common_ui_ic_mobywatel_logo.svg" type="image/x-icon">
+    <link rel="apple-touch-icon" href="apple.png">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#fff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="mObywatel">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <style type="text/css">
+        @font-face {
+            font-family: Inter;
+            font-style: normal;
+            font-weight: 400;
+            src: url("fonts/inter-latin-400-normal.woff2");
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+            font-display: swap;
+        }
+    </style>
+    <style>
+        @font-face {
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: 100;
+            src: url("roboto_light.ttf") format("truetype");
+        }
+        
+        @font-face {
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: 300;
+            src: url("roboto_regular.ttf") format("truetype");
+        }
+        
+        @font-face {
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: 400;
+            src: url("roboto_medium.ttf") format("truetype");
+        }
+        
+        @font-face {
+            font-family: Roboto;
+            font-style: italic;
+            font-weight: 400;
+            src: url("roboto_medium_italic.ttf") format("truetype");
+        }
+        
+        @font-face {
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: 500;
+            src: url("roboto_bold.ttf") format("truetype");
+        }
+        
+        @font-face {
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: 700;
+            src: url("roboto_black.ttf") format("truetype");
+        }
+        
+        @font-face {
+            font-family: Roboto;
+            font-style: normal;
+            font-weight: 900;
+            src: url("roboto_medium_numbers.ttf") format("truetype");
+        }
+        
+         :root {
+            --blue-active: #064792;
+        }
+        
+        * {
+            user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        img {
+            pointer-events: none;
+        }
+        
+        body,
+        html {
+            height: 100%;
+            overscroll-behavior-y: contain;
+            padding: 0;
+            margin: 0;
+            font-family: Roboto, sans-serif;
+            background: #f5f6fb;
+            color: #131419;
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .BottomNav_bottomNav__JQdpA {
+            width: 100%;
+            height: 90px;
+            position: fixed;
+            bottom: 0;
+            background-color: #f5f6fb;
+            border-top: 1px solid #d6d6d6;
+            z-index: 99;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            left: 0;
+        }
+        
+        .BottomNav_bnTab__WzkWH {
+            width: 20%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 10px;
+            cursor: pointer;
+        }
+        
+        .BottomNav_bnTab__WzkWH img {
+            height: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .BottomNav_bnTab__WzkWH span {
+            font-size: .7em;
+            font-weight: 300;
+        }
+        
+        .BottomNav_activeText__6iAIF {
+            color: var(--blue-active);
+        }
+        
+        main {
+            margin-bottom: 100px;
+            /* aby unikać overlap z BottomNav */
+            padding: 20px;
+        }
+        
+        .More_title__mTbAT {
+            font-weight: bold;
+            font-size: 2em;
+        }
+        
+        .More_cardContainer__HfxIE {
+            background-color: #fff;
+            border-radius: .4em;
+            padding: 1em;
+            margin-top: 20px;
+        }
+        
+        .More_singleCard__I4PBH {
+            display: flex;
+            justify-content: space-between;
+            padding: 1em 0;
+        }
+        
+        .More_leftContent__f8xyO,
+        .More_singleCard__I4PBH {
+            display: flex;
+            align-items: center;
+        }
+        
+        .More_singleCard__I4PBH p {
+            margin-left: .5em;
+            line-height: 1;
+            font-weight: bold;
+        }
+        
+        .More_separator__NPggk {
+            height: 1px;
+            width: 100%;
+            background-color: #d6d6d6;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<body>
+    <div class="BottomNav_bottomNav__JQdpA">
+        <div class="BottomNav_bnTab__WzkWH" onclick="window.location.href='dashboard.html'" data-cf-modified-50a3b963dd2a4f7a5a67547f-="">
+            <img src="ab001_home.svg" alt="dashboard">
+            <span>Start</span>
+        </div>
+        <div class="BottomNav_bnTab__WzkWH" onclick="window.location.href='documents.html'" data-cf-modified-50a3b963dd2a4f7a5a67547f-="">
+            <img src="ad005_framed_person.svg" alt="documents">
+            <span>Dokumenty</span>
+        </div>
+        <div class="BottomNav_bnTab__WzkWH" onclick="window.location.href='services.html'" data-cf-modified-50a3b963dd2a4f7a5a67547f-="">
+            <img src="ac001_services.svg" alt="services">
+            <span>Usługi</span>
+        </div>
+        <div class="BottomNav_bnTab__WzkWH" onclick="window.location.href='qr.html'" data-cf-modified-50a3b963dd2a4f7a5a67547f-="">
+            <img src="ai001_scanner_qr.svg" alt="qr">
+            <span>Kod QR</span>
+        </div>
+        <div class="BottomNav_bnTab__WzkWH">
+            <img src="b005_more.svg" alt="more">
+            <span class="BottomNav_activeText__6iAIF">Więcej</span>
+        </div>
+    </div>
+
+    <main class="More_main__Rr0NN">
+        <h1 class="More_title__mTbAT" onclick="if (!window.__cfRLUnblockHandlers) return false; handleSettingsClick()" style="font-weight: bold" data-cf-modified-50a3b963dd2a4f7a5a67547f-="">Ustawienia</h1>
+        <p style="margin-top: 5em; font-size: 1em; font-weight: bold">Twoje dane</p>
+
+        <div class="More_cardContainer__HfxIE">
+            <div class="More_singleCard__I4PBH">
+                <div class="More_leftContent__f8xyO">
+                    <img src="aa008_change_password.svg" alt="Zmień hasło" width="25" height="25">
+                    <p style="font-weight: bold">Zmień hasło</p>
+                </div>
+                <img src="ic_arrow_forward_gray.svg" alt="arrow" width="24" height="24">
+            </div>
+            <div class="More_separator__NPggk"></div>
+            <div class="More_singleCard__I4PBH">
+                <div class="More_leftContent__f8xyO">
+                    <img src="aa009_fingerprint.svg" alt="Logowanie biometryczne" width="25" height="25">
+                    <p style="font-weight: bold">Logowanie biometryczne</p>
+                </div>
+                <img src="ic_arrow_forward_gray.svg" alt="arrow" width="24" height="24">
+            </div>
+            <div class="More_separator__NPggk"></div>
+            <div class="More_singleCard__I4PBH">
+                <div class="More_leftContent__f8xyO">
+                    <img src="ab013_notifications.svg" alt="Powiadomienia" width="25" height="25">
+                    <p style="font-weight: bold">Powiadomienia</p>
+                </div>
+                <img src="ic_arrow_forward_gray.svg" alt="arrow" width="24" height="24">
+            </div>
+            <div class="More_separator__NPggk"></div>
+            <div class="More_singleCard__I4PBH">
+                <div class="More_leftContent__f8xyO">
+                    <img src="ag005_globe.svg" alt="Język aplikacji" width="25" height="25">
+                    <p style="font-weight: bold">Język aplikacji</p>
+                </div>
+                <img src="ic_arrow_forward_gray.svg" alt="arrow" width="24" height="24">
+            </div>
+            <div class="More_separator__NPggk"></div>
+            <div class="More_singleCard__I4PBH">
+                <div class="More_leftContent__f8xyO">
+                    <img src="ae001_published_certificate.svg" alt="Wydane certyfikaty" width="25" height="25">
+                    <p style="font-weight: bold">Wydane certyfikaty</p>
+                </div>
+                <img src="ic_arrow_forward_gray.svg" alt="arrow" width="24" height="24">
+            </div>
+        </div>
+
+        <p style="margin-top: 2em; font-size: 1em; font-weight: bold">Pozostałe</p>
+        <div class="More_cardContainer__HfxIE">
+            <div class="More_singleCard__I4PBH">
+                <div class="More_leftContent__f8xyO">
+                    <img src="aa016_history.svg" alt="Historia aktywności" width="25" height="25">
+                    <p style="font-weight: bold">Historia aktywności</p>
+                </div>
+                <img src="ic_arrow_forward_gray.svg" alt="arrow" width="24" height="24">
+            </div>
+            <div class="More_separator__NPggk"></div>
+            <div class="More_singleCard__I4PBH">
+                <div class="More_leftContent__f8xyO">
+                    <img src="ad005_framed_person.svg" alt="Informacje prawne" width="25" height="25">
+                    <p style="font-weight: bold">Informacje prawne</p>
+                </div>
+                <img src="ic_arrow_forward_gray.svg" alt="arrow" width="24" height="24">
+            </div>
+            <div class="More_separator__NPggk"></div>
+            <div class="More_singleCard__I4PBH">
+                <div class="More_leftContent__f8xyO">
+                    <img src="coi_common_ui_ic_help.svg" alt="Pomoc techniczna" width="25" height="25">
+                    <p style="font-weight: bold">Pomoc techniczna</p>
+                </div>
+                <img src="ic_arrow_forward_gray.svg" alt="arrow" width="24" height="24">
+            </div>
+        </div>
+    </main>
+    <script>
+        (function() {
+            function c() {
+                var b = a.contentDocument || a.contentWindow.document;
+                if (b) {
+                    var d = b.createElement('script');
+                    d.innerHTML = "window.__CF$cv$params={r:'95a2d46aad17e188',t:'MTc1MTY3NjIyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+                    b.getElementsByTagName('head')[0].appendChild(d)
+                }
+            }
+            if (document.body) {
+                var a = document.createElement('iframe');
+                a.height = 1;
+                a.width = 1;
+                a.style.position = 'absolute';
+                a.style.top = 0;
+                a.style.left = 0;
+                a.style.border = 'none';
+                a.style.visibility = 'hidden';
+                document.body.appendChild(a);
+                if ('loading' !== document.readyState) c();
+                else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c);
+                else {
+                    var e = document.onreadystatechange || function() {};
+                    document.onreadystatechange = function(b) {
+                        e(b);
+                        'loading' !== document.readyState && (document.onreadystatechange = e, c())
+                    }
+                }
+            }
+        })();
+    </script>
+</body>
+
+</html>

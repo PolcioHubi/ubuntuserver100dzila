@@ -1,0 +1,11 @@
+
+-r requirements.in
+
+# Development and testing
+pytest
+pytest-cov
+pytest-mock
+pytest-playwright
+ruff
+pip-tools
+locust

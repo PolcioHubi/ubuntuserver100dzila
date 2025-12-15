@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.venv/
+.pip-tools/
+
+# Environment
+.env
+
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+desktop.ini
+
+# Data
+auth_data/
+user_data/
+logs/

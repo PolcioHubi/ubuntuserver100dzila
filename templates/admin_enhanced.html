@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administracyjny</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            background-color: #0d0d0d;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #1a1a1a;
+            padding: 30px;
+            border: 1px solid #333;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        h1 {
+            color: #4caf50;
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background-color: #333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+            padding: 12px 24px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #e0e0e0;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .tab.active {
+            color: #4caf50;
+            border-bottom-color: #4caf50;
+            background-color: #2a2a2a;
+        }
+
+        .tab:hover {
+            color: #4caf50;
+            background-color: #2a2a2a;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: #2a2a2a;
+            color: #e0e0e0;
+            padding: 25px;
+            border: 1px solid #333;
+            text-align: center;
+            transition: transform 0.3s ease, background-color 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background-color: #333;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #4caf50;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #4caf50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .btn {
+            background-color: #333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+            padding: 12px 24px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #4caf50;
+            color: #0d0d0d;
+            border-color: #4caf50;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background-color: #4caf50;
+            color: #0d0d0d;
+            border-color: #4caf50;
+        }
+
+        .btn-success:hover {
+            background-color: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background-color: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+
+        .btn-warning {
+            background-color: #e67e22;
+            color: white;
+            border-color: #e67e22;
+        }
+
+        .btn-warning:hover {
+            background-color: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #555;
+            background-color: #0d0d0d;
+            color: #e0e0e0;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: none;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #333;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background-color: #1a1a1a;
+        }
+
+        .table th, .table td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+            color: #e0e0e0;
+        }
+
+        .table th {
+            background-color: #2a2a2a;
+            font-weight: bold;
+            color: #4caf50;
+            position: sticky;
+            top: 0;
+        }
+
+        .table tr:hover {
+            background-color: #2a2a2a;
+        }
+
+        .table tr:nth-child(even) {
+            background-color: #1a1a1a;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: 1px solid;
+            display: none;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #2a2a2a;
+            color: #4caf50;
+            border-color: #4caf50;
+        }
+
+        .alert-error {
+            background-color: #2a2a2a;
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 10% auto;
+            padding: 30px;
+            border: 1px solid #333;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close {
+            color: #e0e0e0;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #4caf50;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #555;
+            background-color: #0d0d0d;
+            color: #e0e0e0;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #4caf50;
+            box-shadow: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #aaa;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #e0e0e0;
+        }
+
+        /* Style dla modala logów */
+        #logsModalBody h3 {
+            color: #4caf50;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+        .log-entry {
+            background-color: #0d0d0d;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-left: 3px solid #555;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .submission-entry {
+            background-color: #2a2a2a;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 3px solid #4caf50;
+        }
+        .submission-entry pre {
+            background-color: #0d0d0d;
+            color: #e0e0e0;
+            padding: 10px;
+            margin-top: 10px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+
+        .log-viewer {
+            background-color: #0d0d0d;
+            color: #e0e0e0;
+            border: 1px solid #333;
+            padding: 15px;
+            height: 500px;
+            overflow-y: scroll;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .table th, .table td {
+                padding: 10px 8px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Panel Administracyjny</h1>
+            <a href="/admin/logout" class="logout-btn">Wyloguj</a>
+        </div>
+
+        <div class="alert alert-success" id="alertSuccess"></div>
+        <div class="alert alert-error" id="alertError"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">Przegląd</button>
+            <button class="tab" onclick="showTab('access-keys')">Klucze Dostępu</button>
+            <button class="tab" onclick="showTab('registered-users')">Zarejestrowani Użytkownicy</button>
+            <button class="tab" onclick="showTab('file-users')">Użytkownicy Plików</button>
+            <button class="tab" onclick="showTab('logs')">Logi Systemowe</button>
+        </div>
+
+        <!-- Przegląd -->
+        <div id="overview" class="tab-content active">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Łączna liczba użytkowników plików</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalFiles">0</div>
+                    <div class="stat-label">Łączna liczba plików</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSize">0 B</div>
+                    <div class="stat-label">Łączny rozmiar danych</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="registeredUsersCount">0</div>
+                    <div class="stat-label">Zarejestrowani użytkownicy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeKeysCount">0</div>
+                    <div class="stat-label">Aktywne klucze dostępu</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <button class="btn" onclick="refreshData()">🔄 Odśwież dane</button>
+                <button class="btn btn-warning" onclick="exportAllData()">📤 Eksportuj Wszystkie Dane</button>
+            </div>
+
+            <div class="section">
+                <h2>📥 Import Danych z Archiwum</h2>
+                <p>Wybierz plik .zip z kopią zapasową, aby przywrócić dane. Uwaga: obecne dane zostaną nadpisane!</p>
+                <form id="importForm" style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="backupFile">Plik kopii zapasowej (.zip):</label>
+                        <input type="file" id="backupFile" name="backupFile" accept=".zip" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger">Importuj i Nadpisz Dane</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>� Restart Serwera</h2>
+                <p>Po imporcie danych wymagany jest restart serwera, aby zmiany w bazie danych zostały załadowane.</p>
+                <div style="display: flex; gap: 15px; align-items: center; margin-top: 15px;">
+                    <button class="btn btn-warning" onclick="confirmRestart()" id="restartBtn">🔄 Zrestartuj Serwer</button>
+                    <span id="restartStatus" style="color: #888;"></span>
+                </div>
+                <p style="color: #e74c3c; margin-top: 10px; font-size: 12px;">
+                    ⚠️ Restart spowoduje chwilową niedostępność strony (~5-10 sekund). Strona odświeży się automatycznie.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>📢 Wyślij nowe ogłoszenie</h2>
+                <div id="announcementForm">
+                    <div class="form-group">
+                        <label for="announcementTitle">Tytuł:</label>
+                        <input type="text" id="announcementTitle" placeholder="Ważna informacja">
+                    </div>
+                    <div class="form-group">
+                        <label for="announcementMessage">Treść ogłoszenia:</label>
+                        <textarea id="announcementMessage" placeholder="Treść..."></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label for="announcementType">Typ:</label>
+                            <select id="announcementType">
+                                <option value="info">Informacja (niebieski)</option>
+                                <option value="warning">Ostrzeżenie (żółty)</option>
+                                <option value="danger">Ważne (czerwony)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcementExpires">Data wygaśnięcia (opcjonalnie):</label>
+                            <input type="date" id="announcementExpires">
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="sendAnnouncement()">Wyślij Ogłoszenie</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Klucze Dostępu -->
+        <div id="access-keys" class="tab-content">
+            <div class="section">
+                <h2>Generowanie Nowego Klucza Dostępu</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label for="keyDescription">Opis klucza:</label>
+                        <input type="text" id="keyDescription" placeholder="Opcjonalny opis klucza">
+                    </div>
+                    <div class="form-group">
+                        <label for="keyExpires">Ważność (dni):</label>
+                        <select id="keyExpires">
+                            <option value="30">30 dni</option>
+                            <option value="60">60 dni</option>
+                            <option value="90">90 dni</option>
+                            <option value="365">1 rok</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="generateAccessKey()">Generuj Klucz</button>
+            </div>
+
+            <div class="section">
+                <h2>Istniejące Klucze Dostępu</h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Klucz</th>
+                                <th>Opis</th>
+                                <th>Data utworzenia</th>
+                                <th>Data wygaśnięcia</th>
+                                <th>Ostatnie użycie</th>
+                                <th>Liczba użyć</th>
+                                <th>Status</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="accessKeysBody">
+                            <tr><td colspan="8" class="empty-state">Ładowanie...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zarejestrowani Użytkownicy -->
+        <div id="registered-users" class="tab-content">
+            <div class="section">
+                <h2>Zarządzanie zarejestrowanymi użytkownikami</h2>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nazwa użytkownika</th>
+                                <th>Data rejestracji</th>
+                                <th>Ostatnie logowanie</th>
+                                <th>Użyty klucz dostępu</th>
+                                <th>Hash hasła</th>
+                                <th>Hubert Coiny</th>
+                                <th>Status</th>
+                                <th>Akcje</th>
+                                <th>Reset Hasła</th>
+                            </tr>
+                        </thead>
+                        <tbody id="registeredUsersBody">
+                            <tr><td colspan="8" class="empty-state">Ładowanie...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Użytkownicy Plików -->
+        <div id="file-users" class="tab-content">
+            <div class="section">
+                <h2>Zarządzanie użytkownikami plików</h2>
+                <input type="text" class="search-box" placeholder="Szukaj użytkowników..." id="userSearch" onkeyup="filterUsers()">
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nazwa użytkownika</th>
+                                <th>Data utworzenia</th>
+                                <th>Ostatnia aktywność</th>
+                                <th>Liczba plików</th>
+                                <th>Rozmiar</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fileUsersBody">
+                            <tr><td colspan="6" class="empty-state">Ładowanie...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logi Systemowe -->
+        <div id="logs" class="tab-content">
+            <div class="section">
+                <h2>Podgląd Logów Systemowych</h2>
+                <p>Wyświetlane jest ostatnie 100 linii z wybranego pliku logów.</p>
+                <div style="margin-bottom: 20px;">
+                    <button class="btn" onclick="fetchLogs('app.log')">Pokaż app.log</button>
+                    <button class="btn" onclick="fetchLogs('user_activity.log')">Pokaż user_activity.log</button>
+                </div>
+                <h3 id="logFileName"></h3>
+                <div id="logViewer" class="log-viewer">Wybierz plik logów, aby wyświetlić jego zawartość.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal dla wygenerowanego klucza -->
+    <div id="keyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeKeyModal()">&times;</span>
+            <h2>Nowy Klucz Dostępu</h2>
+            <p>Klucz został wygenerowany. Skopiuj go i zapisz w bezpiecznym miejscu:</p>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; word-break: break-all; font-family: monospace;">
+                <span id="generatedKey"></span>
+            </div>
+            <br>
+            <button class="btn" onclick="copyToClipboard()">Skopiuj do schowka</button>
+            <button class="btn btn-success" onclick="closeKeyModal()">Zamknij</button>
+        </div>
+    </div>
+
+    <!-- Modal dla logów użytkownika -->
+    <div id="logsModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <span class="close" onclick="closeLogsModal()">&times;</span>
+            <h2 id="logsModalTitle"></h2>
+            <div id="logsModalBody" style="max-height: 60vh; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Globalne dane
+        let currentData = {
+            stats: {},
+            accessKeys: [],
+            registeredUsers: [],
+            fileUsers: []
+        };
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        // Funkcje nawigacji
+        function showTab(tabName) {
+            // Ukryj wszystkie taby
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Pokaż wybrany tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Funkcje alertów
+        function showAlert(message, type = 'success') {
+            const alertElement = document.getElementById(type === 'success' ? 'alertSuccess' : 'alertError');
+            alertElement.textContent = message;
+            alertElement.style.display = 'block';
+
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // Funkcje ładowania danych
+        async function refreshData() {
+            try {
+                // Załaduj statystyki użytkowników plików
+                const response = await fetch('/admin/api/users');
+                const data = await response.json();
+
+                if (data.success) {
+                    currentData.stats = data.stats;
+                    currentData.fileUsers = data.users_data.users;
+                    updateFileUsersTable();
+                }
+
+                // Załaduj statystyki zarejestrowanych użytkowników
+                await loadRegisteredUsers();
+                await loadAccessKeys();
+
+                // Zaktualizuj statystyki DOPIERO po załadowaniu wszystkich danych
+                updateStats();
+
+                showAlert('Dane zostały odświeżone');
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                showAlert('Błąd podczas odświeżania danych', 'error');
+            }
+        }
+
+        async function loadAccessKeys() {
+            try {
+                const response = await fetch('/admin/api/access-keys');
+                const data = await response.json();
+
+                if (data.success) {
+                    currentData.accessKeys = data.access_keys;
+                    updateAccessKeysTable();
+                }
+            } catch (error) {
+                console.error('Error loading access keys:', error);
+                showAlert('Błąd podczas ładowania kluczy dostępu', 'error');
+            }
+        }
+
+        async function loadRegisteredUsers() {
+            try {
+                const response = await fetch('/admin/api/registered-users');
+                const data = await response.json();
+
+                if (data.success) {
+                    currentData.registeredUsers = data.users;
+                    updateRegisteredUsersTable();
+                }
+            } catch (error) {
+                console.error('Error loading registered users:', error);
+                showAlert('Błąd podczas ładowania zarejestrowanych użytkowników', 'error');
+            }
+        }
+
+        async function loadFileUsers() {
+            try {
+                const response = await fetch('/admin/api/users');
+                const data = await response.json();
+
+                if (data.success) {
+                    currentData.fileUsers = data.users_data.users;
+                    updateFileUsersTable();
+                }
+            } catch (error) {
+                console.error('Error loading file users:', error);
+                showAlert('Błąd podczas ładowania użytkowników plików', 'error');
+            }
+        }
+
+        // Funkcje aktualizacji interfejsu
+        function updateStats() {
+            document.getElementById('totalUsers').textContent = currentData.stats.total_users || 0;
+            document.getElementById('totalFiles').textContent = currentData.stats.total_files || 0;
+            document.getElementById('totalSize').textContent = formatBytes(currentData.stats.total_size || 0);
+            document.getElementById('registeredUsersCount').textContent = currentData.registeredUsers.length;
+
+            const activeKeys = currentData.accessKeys.filter(key => key.is_active).length;
+            document.getElementById('activeKeysCount').textContent = activeKeys;
+        }
+
+        function updateAccessKeysTable() {
+            const tbody = document.getElementById('accessKeysBody');
+
+            if (currentData.accessKeys.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Brak kluczy dostępu</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = currentData.accessKeys.map(key => `
+                <tr>
+                    <td style="font-family: monospace; font-size: 12px; word-break: break-all; max-width: 200px;">
+                        <div style="cursor: pointer;" onclick="toggleKeyVisibility(this)" title="Kliknij aby pokazać/ukryć pełny klucz">
+                            <span class="key-short">${key.key.substring(0, 20)}...</span>
+                            <span class="key-full" style="display: none;">${key.key}</span>
+                        </div>
+                    </td>
+                    <td>${key.description || 'Brak opisu'}</td>
+                    <td>${new Date(key.created_at).toLocaleString()}</td>
+                    <td>${key.expires_at ? new Date(key.expires_at).toLocaleString() : 'Nigdy'}</td>
+                    <td>${key.last_used ? new Date(key.last_used).toLocaleString() : 'Nigdy'}</td>
+                    <td>${key.used_count}</td>
+                    <td>
+                        <span style="color: ${key.is_active ? '#27ae60' : '#e74c3c'};">
+                            ${key.is_active ? 'Aktywny' : 'Nieaktywny'}
+                        </span>
+                    </td>
+                    <td>
+                        ${key.is_active ?
+                            `<button class="btn btn-warning" onclick="deactivateKey('${key.key}')">Dezaktywuj</button>` :
+                            '<span style="color: #999;">Dezaktywowany</span>'
+                        }
+                        <button class="btn btn-danger" onclick="deleteKey('${key.key}')">Usuń</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateRegisteredUsersTable() {
+            const tbody = document.getElementById('registeredUsersBody');
+
+            if (currentData.registeredUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Brak zarejestrowanych użytkowników</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = currentData.registeredUsers.map(user => `
+                <tr>
+                    <td><strong>${user.username}</strong></td>
+                    <td>${new Date(user.created_at).toLocaleString()}</td>
+                    <td>${user.last_login ? new Date(user.last_login).toLocaleString() : 'Nigdy'}</td>
+                    <td style="font-family: monospace; font-size: 12px;">${user.access_key_used ? user.access_key_used.substring(0, 20) + '...' : 'Brak'}</td>
+                    <td style="font-family: monospace; font-size: 11px; max-width: 150px;">
+                        <div style="cursor: pointer;" onclick="togglePasswordVisibility(this)" title="Kliknij aby pokazać/ukryć hash hasła">
+                            <span class="password-short">${user.password ? user.password.substring(0, 16) + '...' : 'Brak'}</span>
+                            <span class="password-full" style="display: none; word-break: break-all;">${user.password || 'Brak'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span style="color: ${user.is_active ? '#27ae60' : '#e74c3c'};">
+                            ${user.is_active ? 'Aktywny' : 'Nieaktywny'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn" onclick="toggleUserStatus('${user.username}')">${user.is_active ? 'Dezaktywuj' : 'Aktywuj'}</button>
+                        <button class="btn btn-danger" onclick="deleteRegisteredUser('${user.username}', true)">Usuń z Plikami</button>
+                        <button class="btn btn-warning" onclick="deleteRegisteredUser('${user.username}', false)">Usuń (Zachowaj Pliki)</button>
+                        <button class="btn" onclick="impersonateUser('${user.username}')" ${user.is_active ? '' : 'disabled title="Nie można impersonować nieaktywnego użytkownika"'}>Impersonuj</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-warning" onclick="resetPasswordPrompt('${user.username}')">Resetuj Hasło</button>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center;">
+                            <button class="btn btn-success" onclick="updateHubertCoins('${user.username}', 1)">+</button>
+                            <span style="margin: 0 10px;">${user.hubert_coins || 0}</span>
+                            <button class="btn btn-warning" onclick="updateHubertCoins('${user.username}', -1)">-</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateFileUsersTable() {
+            const tbody = document.getElementById('fileUsersBody');
+
+            if (currentData.fileUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Brak użytkowników do wyświetlenia</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = currentData.fileUsers.map(user => `
+                <tr>
+                    <td><strong>${user.name}</strong></td>
+                    <td>${user.created_date ? new Date(user.created_date).toLocaleString() : 'Nieznana'}</td>
+                    <td>${user.last_activity ? new Date(user.last_activity).toLocaleString() : 'Nieznana'}</td>
+                    <td>${user.file_count}</td>
+                    <td>${formatBytes(user.total_size)}</td>
+                    <td>
+                        <button class="btn" onclick="viewUserLogs('${user.name}')">Logi</button>
+                        <button class="btn" onclick="downloadUserData('${user.name}')">Pobierz</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Funkcje akcji
+        async function fetchLogs(logFileName) {
+            const logViewer = document.getElementById('logViewer');
+            const logFileNameHeader = document.getElementById('logFileName');
+
+            logViewer.textContent = 'Ładowanie...';
+            logFileNameHeader.textContent = `Podgląd: ${logFileName}`;
+
+            try {
+                const response = await fetch(`/admin/api/logs/${logFileName}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    logViewer.textContent = data.log_content || 'Plik logów jest pusty.';
+                } else {
+                    logViewer.textContent = `Błąd: ${data.error}`;
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error fetching logs:', error);
+                logViewer.textContent = 'Nie udało się pobrać logów. Sprawdź konsolę przeglądarki, aby uzyskać więcej informacji.';
+                showAlert('Nie udało się pobrać logów.', 'error');
+            }
+        }
+
+        // Restart serwera
+        function confirmRestart() {
+            if (confirm('⚠️ Czy na pewno chcesz zrestartować serwer?\n\nStrona będzie niedostępna przez kilka sekund.\nPo restarcie strona odświeży się automatycznie.')) {
+                restartServer();
+            }
+        }
+
+        async function restartServer() {
+            const btn = document.getElementById('restartBtn');
+            const status = document.getElementById('restartStatus');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Restartowanie...';
+            status.textContent = 'Wysyłanie polecenia restartu...';
+            status.style.color = '#f39c12';
+            
+            try {
+                const response = await fetch('/admin/api/restart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    status.textContent = '✅ Restart zainicjowany! Oczekiwanie na ponowne uruchomienie...';
+                    status.style.color = '#27ae60';
+                    showAlert('Serwer restartuje się. Strona odświeży się za chwilę...', 'success');
+                    
+                    // Czekaj i próbuj odświeżyć stronę
+                    setTimeout(() => {
+                        status.textContent = 'Sprawdzanie dostępności serwera...';
+                        checkServerAndReload();
+                    }, 3000);
+                } else {
+                    status.textContent = '❌ ' + data.error;
+                    status.style.color = '#e74c3c';
+                    showAlert(data.error, 'error');
+                    btn.disabled = false;
+                    btn.textContent = '🔄 Zrestartuj Serwer';
+                }
+            } catch (error) {
+                // Błąd połączenia może oznaczać, że serwer już się restartuje
+                status.textContent = 'Serwer może już się restartować. Sprawdzanie...';
+                status.style.color = '#f39c12';
+                setTimeout(() => checkServerAndReload(), 2000);
+            }
+        }
+
+        function checkServerAndReload(attempts = 0) {
+            const status = document.getElementById('restartStatus');
+            const maxAttempts = 30; // Max 30 prób (30 sekund)
+            
+            if (attempts >= maxAttempts) {
+                status.textContent = '⚠️ Timeout. Odśwież stronę ręcznie.';
+                status.style.color = '#e74c3c';
+                document.getElementById('restartBtn').disabled = false;
+                document.getElementById('restartBtn').textContent = '🔄 Zrestartuj Serwer';
+                return;
+            }
+            
+            fetch('/admin/api/stats', { method: 'GET' })
+                .then(response => {
+                    if (response.ok) {
+                        status.textContent = '✅ Serwer działa! Odświeżanie strony...';
+                        status.style.color = '#27ae60';
+                        setTimeout(() => window.location.reload(), 500);
+                    } else {
+                        throw new Error('Server not ready');
+                    }
+                })
+                .catch(() => {
+                    status.textContent = `Oczekiwanie na serwer... (${attempts + 1}/${maxAttempts})`;
+                    setTimeout(() => checkServerAndReload(attempts + 1), 1000);
+                });
+        }
+
+        async function sendAnnouncement() {
+            const title = document.getElementById('announcementTitle').value;
+            const message = document.getElementById('announcementMessage').value;
+            const type = document.getElementById('announcementType').value;
+            let expires_at = document.getElementById('announcementExpires').value;
+
+            if (!title || !message) {
+                showAlert('Tytuł i treść ogłoszenia są wymagane.', 'error');
+                return;
+            }
+
+            // Format daty na ISO 8601, jeśli została podana
+            if (expires_at) {
+                // Dodajemy czas, aby upewnić się, że data jest interpretowana jako koniec dnia w lokalnej strefie czasowej
+                expires_at = new Date(expires_at + "T23:59:59").toISOString();
+            } else {
+                expires_at = null;
+            }
+
+            try {
+                const response = await fetch('/admin/api/announcements', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ title, message, type, expires_at })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Ogłoszenie zostało wysłane!');
+                    document.getElementById('announcementTitle').value = '';
+                    document.getElementById('announcementMessage').value = '';
+                    document.getElementById('announcementExpires').value = '';
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error sending announcement:', error);
+                showAlert('Błąd podczas wysyłania ogłoszenia.', 'error');
+            }
+        }
+
+        async function generateAccessKey() {
+            const description = document.getElementById('keyDescription').value;
+            const expires_days = parseInt(document.getElementById('keyExpires').value);
+
+            try {
+                const response = await fetch('/admin/api/generate-access-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        description: description,
+                        validity_days: expires_days
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('generatedKey').textContent = data.access_key;
+                    document.getElementById('keyModal').style.display = 'block';
+                    document.getElementById('keyDescription').value = '';
+                    await loadAccessKeys();
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error generating access key:', error);
+                showAlert('Błąd podczas generowania klucza', 'error');
+            }
+        }
+
+        async function deactivateKey(accessKey) {
+            if (!confirm('Czy na pewno chcesz dezaktywować ten klucz?')) return;
+
+            try {
+                const response = await fetch('/admin/api/deactivate-access-key', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        access_key: accessKey
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message);
+                    await loadAccessKeys();
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error deactivating access key:', error);
+                showAlert('Błąd podczas dezaktywacji klucza', 'error');
+            }
+        }
+
+        async function deleteKey(accessKey) {
+            if (!confirm('Czy na pewno chcesz usunąć ten klucz? Ta operacja jest nieodwracalna.')) return;
+
+            try {
+                const response = await fetch('/admin/api/delete-access-key', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        access_key: accessKey
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message);
+                    await loadAccessKeys();
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting access key:', error);
+                showAlert('Błąd podczas usuwania klucza', 'error');
+            }
+        }
+
+        function toggleKeyVisibility(element) {
+            const shortKey = element.querySelector('.key-short');
+            const fullKey = element.querySelector('.key-full');
+
+            if (shortKey.style.display === 'none') {
+                shortKey.style.display = 'inline';
+                fullKey.style.display = 'none';
+            } else {
+                shortKey.style.display = 'none';
+                fullKey.style.display = 'inline';
+            }
+        }
+
+        function togglePasswordVisibility(element) {
+            const shortPassword = element.querySelector('.password-short');
+            const fullPassword = element.querySelector('.password-full');
+
+            if (shortPassword.style.display === 'none') {
+                shortPassword.style.display = 'inline';
+                fullPassword.style.display = 'none';
+            } else {
+                shortPassword.style.display = 'none';
+                fullPassword.style.display = 'inline';
+            }
+        }
+
+        async function toggleUserStatus(username) {
+            try {
+                const response = await fetch('/admin/api/toggle-user-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        username: username
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message);
+                    await loadRegisteredUsers();
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error toggling user status:', error);
+                showAlert('Błąd podczas zmiany statusu użytkownika', 'error');
+            }
+        }
+
+        async function deleteRegisteredUser(username, deleteFiles) {
+            const confirmationMessage = deleteFiles 
+                ? `Czy na pewno chcesz usunąć użytkownika ${username} ORAZ wszystkie jego pliki? Tej operacji nie można cofnąć.`
+                : `Czy na pewno chcesz usunąć użytkownika ${username}? Jego pliki zostaną zachowane.`;
+
+            if (!confirm(confirmationMessage)) return;
+
+            try {
+                const response = await fetch(`/admin/api/delete-registered-user/${username}?delete_files=${deleteFiles}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message);
+                    await refreshData();
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting registered user:', error);
+                showAlert('Błąd podczas usuwania zarejestrowanego użytkownika', 'error');
+            }
+        }
+
+        async function updateHubertCoins(username, amount) {
+            try {
+                const response = await fetch('/admin/api/update-hubert-coins', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        amount: amount
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message);
+                    await loadRegisteredUsers();
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error updating Hubert Coins:', error);
+                showAlert('Błąd podczas aktualizacji Hubert Coinów', 'error');
+            }
+        }
+
+        async function resetPasswordPrompt(username) {
+            const newPassword = prompt(`Wprowadź nowe hasło dla użytkownika ${username}:`);
+            if (newPassword === null || newPassword.trim() === '') {
+                showAlert('Resetowanie hasła anulowane lub hasło jest puste.', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showAlert('Hasło musi mieć co najmniej 6 znaków.', 'error');
+                return;
+            }
+
+            if (!confirm(`Czy na pewno chcesz zresetować hasło dla użytkownika ${username}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/api/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        new_password: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message);
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                showAlert('Błąd podczas resetowania hasła', 'error');
+            }
+        }
+
+        // Funkcje dla użytkowników plików
+        function closeLogsModal() {
+            document.getElementById('logsModal').style.display = 'none';
+        }
+
+        async function viewUserLogs(username) {
+            try {
+                const response = await fetch(`/admin/api/user-logs/${username}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const modalTitle = document.getElementById('logsModalTitle');
+                    const modalBody = document.getElementById('logsModalBody');
+
+                    modalTitle.textContent = `📊 Logi użytkownika: ${username}`;
+
+                    let content = '<h3>🖼️ Podgląd zdjęcia</h3>';
+                    const imagePreviewContainer = document.createElement('div');
+                    imagePreviewContainer.id = 'userImagePreview';
+                    imagePreviewContainer.style.marginBottom = '20px';
+                    imagePreviewContainer.style.textAlign = 'center';
+
+                    const imageFile = data.files.find(f => f.name.match(/\.(jpeg|jpg|gif|png)$/i));
+
+                    if (imageFile) {
+                        const imageUrl = `/user_files/${username}/${imageFile.name}`;
+                        imagePreviewContainer.innerHTML = `<img src="${imageUrl}" alt="Zdjęcie użytkownika ${username}" style="max-width: 100%; max-height: 300px; border: 1px solid #333;">`;
+                    } else {
+                        imagePreviewContainer.innerHTML = '<p>Użytkownik nie przesłał zdjęcia.</p>';
+                    }
+
+                    content += imagePreviewContainer.outerHTML;
+
+                    content += '<h3>📁 Pliki</h3>';
+                    if (data.files && data.files.length > 0) {
+                        content += data.files.map(f => `<div class="log-entry">${f.name} (${formatBytes(f.size)}) - ${new Date(f.modified).toLocaleString()}</div>`).join('');
+                    } else {
+                        content += '<p>Brak plików.</p>';
+                    }
+
+                    content += '<h3>📋 Przesłane formularze</h3>';
+                    if (data.submissions && data.submissions.length > 0) {
+                        content += data.submissions.map(s => `
+                            <div class="submission-entry">
+                                <strong>Data:</strong> ${new Date(s.timestamp).toLocaleString()}<br>
+                                <strong>IP:</strong> ${s.ip_address}
+                                <pre>${JSON.stringify(s.form_data, null, 2)}</pre>
+                            </div>
+                        `).join('');
+                    } else {
+                        content += '<p>Brak przesłanych formularzy.</p>';
+                    }
+
+                    modalBody.innerHTML = content;
+                    document.getElementById('logsModal').style.display = 'block';
+                } else {
+                    showAlert(data.error || 'Błąd podczas pobierania logów', 'error');
+                }
+            } catch (error) {
+                console.error('Error viewing user logs:', error);
+                showAlert('Błąd podczas pobierania logów', 'error');
+            }
+        }
+
+        async function downloadUserData(username) {
+            try {
+                const response = await fetch(`/admin/api/download-user/${username}`);
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `${username}_data.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showAlert(`Dane użytkownika ${username} zostały pobrane`);
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error downloading user data:', error);
+                showAlert('Błąd podczas pobierania danych użytkownika', 'error');
+            }
+        }
+
+        async function deleteRegisteredUser(username) {
+            if (!confirm(`Czy na pewno chcesz usunąć użytkownika ${username} i wszystkie jego dane? Tej operacji nie można cofnąć.`)) return;
+
+            try {
+                const response = await fetch(`/admin/api/delete-registered-user/${username}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message);
+                    await refreshData();
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting registered user:', error);
+                showAlert('Błąd podczas usuwania zarejestrowanego użytkownika', 'error');
+            }
+        }
+
+        async function deleteUserFiles(username) {
+            if (!confirm(`Czy na pewno chcesz usunąć WSZYSTKIE pliki użytkownika ${username}? Konto użytkownika NIE zostanie usunięte.`)) return;
+
+            try {
+                const response = await fetch(`/admin/api/delete-user-files/${username}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message);
+                    await refreshData();
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting user files:', error);
+                showAlert('Błąd podczas usuwania plików użytkownika', 'error');
+            }
+        }
+
+        async function impersonateUser(username) {
+            if (!confirm(`Czy na pewno chcesz impersonować użytkownika ${username}? Zostaniesz wylogowany ze swojego konta admina i zalogowany jako ten użytkownik.`)) return;
+
+            try {
+                const response = await fetch(`/admin/api/impersonate/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ username: username })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Rozpoczynanie impersonacji... Przekierowywanie.');
+                    window.location.href = '/'; // Przekieruj na stronę główną jako nowy użytkownik
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error impersonating user:', error);
+                showAlert('Błąd podczas próby impersonacji.', 'error');
+            }
+        }
+
+        // Funkcje pomocnicze
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('#fileUsersBody tr');
+
+            rows.forEach(row => {
+                const username = row.cells[0]?.textContent.toLowerCase() || '';
+                if (username.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function closeKeyModal() {
+            document.getElementById('keyModal').style.display = 'none';
+        }
+
+        async function copyToClipboard() {
+            const keyText = document.getElementById('generatedKey').textContent;
+            try {
+                await navigator.clipboard.writeText(keyText);
+                showAlert('Klucz został skopiowany do schowka!');
+            } catch (err) {
+                console.error('Błąd podczas kopiowania klucza za pomocą navigator.clipboard:', err);
+                // Fallback for older browsers or non-secure contexts
+                try {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = keyText;
+                    textArea.style.position = 'fixed'; // Avoid scrolling to bottom
+                    textArea.style.left = '-9999px'; // Hide from view
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    document.execCommand('copy');
+                    textArea.remove();
+                    showAlert('Klucz został skopiowany do schowka (fallback)!');
+                } catch (fallbackErr) {
+                    console.error('Błąd podczas kopiowania klucza za pomocą document.execCommand:', fallbackErr);
+                    showAlert('Nie udało się skopiować klucza.', 'error');
+                }
+            }
+        }
+
+        // Inicjalizacja
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshData();
+
+            // Obsługa formularza importu
+            const importForm = document.getElementById('importForm');
+            importForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const fileInput = document.getElementById('backupFile');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    showAlert('Proszę wybrać plik do importu.', 'error');
+                    return;
+                }
+
+                if (!confirm('Czy na pewno chcesz zaimportować dane z tego pliku? Wszystkie obecne dane zostaną nadpisane! Ta operacja jest nieodwracalna.')) {
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('backupFile', file);
+
+                try {
+                    const response = await fetch('/admin/api/import/all', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showAlert(data.message, 'success'); // Show the message from the backend
+                        fileInput.value = ''; // Clear the file input
+                    } else {
+                        showAlert(data.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error importing data:', error);
+                    showAlert('Wystąpił krytyczny błąd podczas importu.', 'error');
+                }
+            });
+        });
+
+        // Funkcja do eksportu danych
+        function exportAllData() {
+            showAlert('Rozpoczynam przygotowywanie archiwum do eksportu...');
+            window.location.href = '/admin/api/export/all';
+        }
+
+        // Zamknij modal po kliknięciu poza nim
+        window.onclick = function(event) {
+            const modal = document.getElementById('keyModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

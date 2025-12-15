@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./auth_data:/app/auth_data
+      - ./user_data:/app/user_data
+      - ./logs:/app/logs
+    ports:
+      - "5000:5000" # Wystaw port 5000 kontenera na port 5000 hosta

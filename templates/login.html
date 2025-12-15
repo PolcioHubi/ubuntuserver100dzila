@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token_func() }}">
+    <title>Logowanie - Podmieniacz Danych HTML</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Logowanie</h1>
+            <p>Zaloguj się do swojego konta</p>
+        </div>
+
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <form id="loginForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token_func() }}"/>
+            <div class="form-group">
+                <label for="username">Nazwa użytkownika:</label>
+                <input type="text" id="username" name="username" required
+                       placeholder="Wprowadź nazwę użytkownika">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Hasło:</label>
+                <input type="password" id="password" name="password" required
+                       placeholder="Wprowadź hasło">
+            </div>
+            <div style="text-align: right; margin-top: -15px; margin-bottom: 15px;">
+                <a href="/recover_password_page" style="color: #4caf50; text-decoration: none; font-size: 12px;">Zapomniałem hasła?</a>
+            </div>
+
+            <div class="form-group remember-me">
+                <input type="checkbox" id="remember" name="remember">
+                <label for="remember">Zapamiętaj mnie</label>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Logowanie...</p>
+            </div>
+
+            <button type="submit" class="btn" id="loginBtn">Zaloguj się</button>
+        </form>
+
+        <div class="links">
+            <a href="/register">Nie masz konta? Zarejestruj się</a>
+            <a href="/">← Powrót do strony głównej</a>
+            <a href="/recover_password_page">Odzyskaj hasło za pomocą tokena</a>
+        </div>
+
+        <div class="admin-link">
+            <a href="/admin/login">Panel administratora</a>
+        </div>
+
+        <div class="stats-section">
+            <h2>Statystyki Użytkowników</h2>
+            <p>Łącznie zarejestrowanych użytkowników: <strong>{{ total_registered_users }}</strong></p>
+            <p>Aktywnych użytkowników: <strong>{{ num_active_users }}</strong></p>
+            {% if top_user %}
+                <p>Użytkownik z największą liczbą Hubert Coinów: <strong>{{ top_user.username }} ({{ top_user.hubert_coins }} HC)</strong></p>
+            {% else %}
+                <p>Brak użytkowników z Hubert Coinami.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Walidacja po stronie klienta
+            if (!username) {
+                showAlert('Nazwa użytkownika jest wymagana', 'error');
+                return;
+            }
+
+            if (!password) {
+                showAlert('Hasło jest wymagane', 'error');
+                return;
+            }
+
+            // Wyświetl loading
+            showLoading(true);
+
+            const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        remember: document.getElementById('remember').checked
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Logowanie pomyślne! Przekierowywanie...', 'success');
+
+                    // Przekieruj do strony głównej po 1 sekundzie
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                } else {
+                    showAlert(data.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Wystąpił błąd podczas logowania. Spróbuj ponownie.', 'error');
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        function showAlert(message, type) {
+            const alertElement = document.getElementById(type === 'success' ? 'successAlert' : 'errorAlert');
+            const otherAlert = document.getElementById(type === 'success' ? 'errorAlert' : 'successAlert');
+
+            // Ukryj drugi alert
+            otherAlert.style.display = 'none';
+
+            // Pokaż odpowiedni alert
+            alertElement.textContent = message;
+            alertElement.style.display = 'block';
+
+            // Ukryj alert po 5 sekundach (chyba że to sukces)
+            if (type !== 'success') {
+                setTimeout(() => {
+                    alertElement.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const button = document.getElementById('loginBtn');
+
+            if (show) {
+                loading.style.display = 'block';
+                button.disabled = true;
+                button.textContent = 'Logowanie...';
+            } else {
+                loading.style.display = 'none';
+                button.disabled = false;
+                button.textContent = 'Zaloguj się';
+            }
+        }
+
+        // Obsługa Enter w polach formularza
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Sprawdź czy są parametry URL (np. po przekierowaniu z rejestracji)
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+        if (message === 'registered') {
+            showAlert('Rejestracja przebiegła pomyślnie! Możesz się teraz zalogować.', 'success');
+        }
+    </script>
+</body>
+</html>
