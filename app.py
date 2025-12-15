@@ -2679,11 +2679,13 @@ def api_restart_server():
         app.logger.warning(f"Server restart initiated by admin from IP: {request.remote_addr}")
         
         # Wykonaj restart usługi (wymaga konfiguracji sudoers)
+        # Używamy pełnych ścieżek dla bezpieczeństwa i pewności działania
         result = subprocess.run(
-            ["sudo", "systemctl", "restart", "mobywatel"],
+            ["/usr/bin/sudo", "/bin/systemctl", "restart", "mobywatel"],
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=30,
+            env={"PATH": "/usr/bin:/bin:/usr/sbin:/sbin"}
         )
         
         if result.returncode == 0:
